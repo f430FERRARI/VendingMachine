@@ -11,7 +11,8 @@ public class VendingMachine {
 	ArrayList<Integer> coinDenominations = new ArrayList<Integer>(); 						//List of coin kinds 
 	ArrayList<ArrayList<Coin>> coinDispenser = new ArrayList<ArrayList<Coin>>();			//Coin types and their loaded coin objects
 	ArrayList<Coin> loadedCoins = new ArrayList<Coin>();									//Payment coins 
-	int paymentCredit = 0;																	//Total value of money loaded into the machine
+	int currentPaymentCredit = 0;															//Current money for current purchase
+	int totalPayments = 0;																	//Total value of money loaded into the machine
 	ArrayList<ArrayList<Pop>> popDispenser = new ArrayList<ArrayList<Pop>>(); 				//Pop kinds and their loaded pop objects
 	
 	//Delivery chute items

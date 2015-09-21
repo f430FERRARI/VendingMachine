@@ -2,7 +2,6 @@ package ca.ucalgary.seng301.myvendingmachine;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -468,7 +467,8 @@ public class VendingMachineFactory implements IVendingMachineFactory {
     	
 		Coin paymentCoin = new Coin(value);
     	if (vendingMachine.coinDenominations.contains(value)) { 
-    		vendingMachine.paymentCredit += value;
+    		vendingMachine.currentPaymentCredit += value;											//Increase current payments
+    		vendingMachine.totalPayments += value;													//Increase total payments to the machine
     		vendingMachine.loadedCoins.add(paymentCoin); 		    								//See if coin kind is value, load the machine if it is
     	} else { 
     		vendingMachine.change.add(paymentCoin);													//Put coin into the delivery chute if it is not a valid kind
@@ -484,20 +484,20 @@ public class VendingMachineFactory implements IVendingMachineFactory {
     	int price = vendingMachine.selectionButtons.get(value).getPrice(); 
     	if (vendingMachine.popDispenser.get(value).isEmpty()) { 
     		//Do nothing
-    	} else if (vendingMachine.paymentCredit >= price) {																		
+    	} else if (vendingMachine.currentPaymentCredit >= price) {																		
     		vendingMachine.popDispenser.get(value).remove(0); 										//Remove the chosen pop from its pop array
     		Pop purchasedPop = new Pop(vendingMachine.selectionButtons.get(value).getName());  	
     		vendingMachine.unextractedPop.add(purchasedPop);										//Add selected pop to delivery chute
     		
-    		//Store payment into coin dispenser
+    		/*//Store payment into coin dispenser
     		for (Coin paymentCoins : vendingMachine.loadedCoins) { 
         		int coinIndex = vendingMachine.coinDenominations.indexOf(paymentCoins.getValue()); 	//Find index for coin
         		vendingMachine.coinDispenser.get(coinIndex).add(paymentCoins);						//Puts coin into its proper array
         	} 
-        	vendingMachine.loadedCoins.clear();  
+        	vendingMachine.loadedCoins.clear();  */
         	
-        	vendingMachine.paymentCredit = vendingMachine.paymentCredit - price; 					//Calculate change
-        	makeChange(vendingMachine.paymentCredit); 												//Make change and put it into the delivery chute
+        	vendingMachine.currentPaymentCredit = vendingMachine.currentPaymentCredit - price; 		//Calculate change
+        	makeChange(vendingMachine.currentPaymentCredit); 										//Make change and put it into the delivery chute
     	}     	
     }
 
@@ -512,7 +512,7 @@ public class VendingMachineFactory implements IVendingMachineFactory {
     			vendingMachine.change.add(coinForChange);											//Add change to change array
     		} 
     	} 
-    	vendingMachine.paymentCredit = 0; 															//Clear value of loaded coins
+    	vendingMachine.currentPaymentCredit = 0; 													//Clear value of current payments
     }
     
     @Override
@@ -617,13 +617,8 @@ public class VendingMachineFactory implements IVendingMachineFactory {
     	}  
     	unloadArray.add(valueOfUnusedCoins);
     	
-    	//Add the value of unused payment coins to the unload array
-    	int valueOfUnusedLoadedCoins = 0;														//Counter for total value of loaded coins
-    	for (Coin loadedCoin : vendingMachine.loadedCoins) { 
-    		valueOfUnusedLoadedCoins += loadedCoin.getValue();					
-    	}  
-    	vendingMachine.loadedCoins.clear(); 													//Clear all items from loaded coins array
-    	unloadArray.add(valueOfUnusedLoadedCoins);
+    	//Add the value of coins payed into the machine
+    	unloadArray.add(vendingMachine.totalPayments);
     	
     	for (ArrayList<Pop> popKind : vendingMachine.popDispenser) { 							//TODO: Does this need to include names?
     		for (Pop pop : popKind) {  
